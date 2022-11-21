@@ -1,0 +1,19 @@
+{
+    "fmt": {
+        "options": {
+            "indentWidth": 4
+        }
+    },
+    "lint": {
+        "files": {
+            "exclude": ["lib/parser.ts"]
+        },
+        "rules": {
+            "exclude": ["no-explicit-any", "no-unused-vars"]
+        }
+    },
+    "tasks": {
+        "parser": "tspeg res/grammar.peg lib/parser.ts",
+        "compile": "deno run --allow-read --allow-write src/cli.ts"
+    }
+}

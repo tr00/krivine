@@ -1,0 +1,16 @@
+mod := _args={_ inner=expr}+ _ $
+    .args = expr[] { return _args.map(arg => arg.inner) }
+
+expr := atom | abs | app
+atom := int | sym
+
+app := '\(' _ func=expr _args={_ inner=expr}* _ '\)'
+    .args = expr[] { return _args.map(arg => arg.inner) }
+
+abs := '\(' _args={_ inner=sym}+ _ '\)' _ '\=\>' _ body=expr
+    .args = sym[] { return _args.map(arg => arg.inner) }
+
+int := value='[0-9]+'
+sym := value='[a-zA-Z_][a-zA-Z0-9_]*'
+
+_ := '[ \t\n]*'

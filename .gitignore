@@ -1,0 +1,8 @@
+
+# vscode
+.vscode/*
+
+out/*
+exp/*
+
+**/*.o
