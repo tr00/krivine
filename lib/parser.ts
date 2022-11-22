@@ -7,7 +7,7 @@
 * app := '\(' _args={_ inner=expr}* _ '\)'
 *     .args = expr[] { return _args.map(arg => arg.inner) }
 * abs := '\(' _args={_ inner=sym}+ _ '\)' _ '\=\>' _ body=expr
-*     .args = sym[] { return [body].concat(_args.map(arg => arg.inner)) }
+*     .args = expr[] { return [body].concat(_args.map(arg => arg.inner)) }
 * int := value='[0-9]+'
 * sym := value='[a-zA-Z_][a-zA-Z0-9_]*'
 * _ := '[ \t\n]*'
@@ -75,11 +75,11 @@ export class abs {
     public kind: ASTKinds.abs = ASTKinds.abs;
     public _args: abs_$0[];
     public body: expr;
-    public args: sym[];
+    public args: expr[];
     constructor(_args: abs_$0[], body: expr) {
         this._args = _args;
         this.body = body;
-        this.args = ((): sym[] => {
+        this.args = ((): expr[] => {
             return [body].concat(_args.map((arg) => arg.inner));
         })();
     }

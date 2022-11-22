@@ -15,5 +15,10 @@
     "tasks": {
         "parser": "tspeg res/grammar.peg lib/parser.ts",
         "compile": "deno run --allow-read --allow-write src/cli.ts"
+    },
+    "test": {
+        "files": {
+            "exclude": ["out/"]
+        }
     }
 }
