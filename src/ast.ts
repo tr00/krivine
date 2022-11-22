@@ -33,7 +33,9 @@ export class Integer implements Node {
         this.original = original;
     }
 
-    readonly value = () => parseInt(this.original);
+    get value() {
+        return parseInt(this.original);
+    }
 }
 
 export class Symbol implements Node {
@@ -45,7 +47,9 @@ export class Symbol implements Node {
         this.original = original;
     }
 
-    readonly value = () => this.original;
+    get value() {
+        return this.original;
+    }
 }
 
 export class Lambda implements Node {
@@ -57,8 +61,13 @@ export class Lambda implements Node {
         this.children = children;
     }
 
-    readonly body = () => this.children[0];
-    readonly args = () => this.children.slice(1) as Symbol[];
+    get body() {
+        return this.children[0];
+    }
+
+    get args() {
+        return this.children.slice(1) as Symbol[];
+    }
 }
 
 export class Apply implements Node {
@@ -70,8 +79,13 @@ export class Apply implements Node {
         this.children = children;
     }
 
-    readonly func = () => this.children[0];
-    readonly args = () => this.children.slice(1);
+    get func() {
+        return this.children[0];
+    }
+
+    get args() {
+        return this.children.slice(1);
+    }
 }
 
 export class Block implements Node {
@@ -95,6 +109,11 @@ export class Assign implements Node {
         this.children = children;
     }
 
-    readonly name = () => this.children[0]; // as Symbol
-    readonly expr = () => this.children[1];
+    get name() {
+        return this.children[0] as Symbol;
+    }
+
+    get expr() {
+        return this.children[1];
+    }
 }

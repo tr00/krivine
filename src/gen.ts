@@ -48,7 +48,7 @@ function compileSymbol(
     ctx: Context,
     ccu: CompilationUnit,
 ): string {
-    return ctx.getsym(sym.value());
+    return ctx.getsym(sym.value);
 }
 
 function compileInteger(
@@ -56,7 +56,7 @@ function compileInteger(
     ctx: Context,
     ccu: CompilationUnit,
 ): string {
-    return int.value().toString();
+    return int.value.toString();
 }
 
 function compileLambda(
@@ -66,8 +66,8 @@ function compileLambda(
 ): string {
     ctx = new Context();
 
-    const args = abs.args().map((sym: Symbol) => {
-        const key = sym.value();
+    const args = abs.args.map((sym: Symbol) => {
+        const key = sym.value;
         const val = ctx.gensym(key);
 
         ctx.addsym({ key, val });
@@ -78,7 +78,7 @@ function compileLambda(
     console.log(ctx);
 
     const type = "kv_any_t";
-    const body = compile(abs.body(), ctx, ccu);
+    const body = compile(abs.body, ctx, ccu);
     const name = `kv_abs${ccu.header.length}_f`;
 
     ccu.emitHeader(`${type} ${name}(${args});`);
@@ -92,8 +92,8 @@ function compileApply(
     ctx: Context,
     ccu: CompilationUnit,
 ): string {
-    const func = compile(app.func(), ctx, ccu);
-    const args = app.args()
+    const func = compile(app.func, ctx, ccu);
+    const args = app.args
         .map((arg) => compile(arg, ctx, ccu))
         .join(", ");
 
