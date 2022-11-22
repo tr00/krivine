@@ -75,6 +75,8 @@ function compileLambda(
         return `kv_any_t ${val}`;
     }).join(", ");
 
+    console.log(ctx);
+
     const type = "kv_any_t";
     const body = compile(abs.body(), ctx, ccu);
     const name = `kv_abs${ccu.header.length}_f`;

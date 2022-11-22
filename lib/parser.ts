@@ -4,10 +4,10 @@
 *     .args = expr[] { return _args.map(arg => arg.inner) }
 * expr := atom | abs | app
 * atom := int | sym
-* app := '\(' _ func=expr _args={_ inner=expr}* _ '\)'
+* app := '\(' _args={_ inner=expr}* _ '\)'
 *     .args = expr[] { return _args.map(arg => arg.inner) }
 * abs := '\(' _args={_ inner=sym}+ _ '\)' _ '\=\>' _ body=expr
-*     .args = sym[] { return _args.map(arg => arg.inner) }
+*     .args = sym[] { return [body].concat(_args.map(arg => arg.inner)) }
 * int := value='[0-9]+'
 * sym := value='[a-zA-Z_][a-zA-Z0-9_]*'
 * _ := '[ \t\n]*'
@@ -58,11 +58,9 @@ export type atom_1 = int;
 export type atom_2 = sym;
 export class app {
     public kind: ASTKinds.app = ASTKinds.app;
-    public func: expr;
     public _args: app_$0[];
     public args: expr[];
-    constructor(func: expr, _args: app_$0[]) {
-        this.func = func;
+    constructor(_args: app_$0[]) {
         this._args = _args;
         this.args = ((): expr[] => {
             return _args.map((arg) => arg.inner);
@@ -82,7 +80,7 @@ export class abs {
         this._args = _args;
         this.body = body;
         this.args = ((): sym[] => {
-            return _args.map((arg) => arg.inner);
+            return [body].concat(_args.map((arg) => arg.inner));
         })();
     }
 }
@@ -178,15 +176,12 @@ export class Parser {
     }
     public matchapp($$dpth: number, $$cr?: ErrorTracker): Nullable<app> {
         return this.run<app>($$dpth, () => {
-            let $scope$func: Nullable<expr>;
             let $scope$_args: Nullable<app_$0[]>;
             let $$res: Nullable<app> = null;
             if (
                 true &&
                 this.regexAccept(String.raw`(?:\()`, $$dpth + 1, $$cr) !==
                     null &&
-                this.match_($$dpth + 1, $$cr) !== null &&
-                ($scope$func = this.matchexpr($$dpth + 1, $$cr)) !== null &&
                 ($scope$_args = this.loop<app_$0>(
                         () => this.matchapp_$0($$dpth + 1, $$cr),
                         true,
@@ -194,7 +189,7 @@ export class Parser {
                 this.match_($$dpth + 1, $$cr) !== null &&
                 this.regexAccept(String.raw`(?:\))`, $$dpth + 1, $$cr) !== null
             ) {
-                $$res = new app($scope$func, $scope$_args);
+                $$res = new app($scope$_args);
             }
             return $$res;
         });

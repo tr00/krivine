@@ -1,5 +1,5 @@
-import { gen } from "./gen.ts";
-import { pcc } from "./pcc.ts";
+import gen from "./gen.ts";
+import pcc from "./pcc.ts";
 
 if (Deno.args.length < 1) throw new Error("expected source file");
 
@@ -11,4 +11,6 @@ const src = await Deno.readTextFile(file);
 
 const ast = pcc({ name: "unknown", data: src });
 
-gen(ast);
+Deno.writeTextFile("out/ast.json", JSON.stringify(ast));
+
+gen(ast, "test");
