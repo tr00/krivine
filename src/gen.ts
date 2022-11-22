@@ -1,4 +1,4 @@
-import { Apply, Integer, Kind, Lambda, Module, Node, Symbol } from "./ast.ts";
+import { Apply, Integer, Kind, Lambda, Node, Symbol } from "./ast.ts";
 
 class CompilationUnit {
     header: string[] = [];
@@ -48,7 +48,7 @@ function compileSymbol(
     ctx: Context,
     ccu: CompilationUnit,
 ): string {
-    return ctx.getsym(sym.name);
+    return ctx.getsym(sym.value());
 }
 
 function compileInteger(
@@ -56,26 +56,27 @@ function compileInteger(
     ctx: Context,
     ccu: CompilationUnit,
 ): string {
-    return int.value.toString();
+    return int.value().toString();
 }
 
 function compileLambda(
     abs: Lambda,
-    _: Context,
+    ctx: Context,
     ccu: CompilationUnit,
 ): string {
-    const ctx = new Context();
+    ctx = new Context();
 
-    const args = abs.args.map(({ name }) => {
-        const sym = ctx.gensym(name);
+    const args = abs.args().map((sym: Symbol) => {
+        const key = sym.value();
+        const val = ctx.gensym(key);
 
-        ctx.addsym({ key: name, val: sym });
+        ctx.addsym({ key, val });
 
-        return `kv_any_t ${sym}`;
+        return `kv_any_t ${val}`;
     }).join(", ");
 
     const type = "kv_any_t";
-    const body = compile(abs.body, ctx, ccu);
+    const body = compile(abs.body(), ctx, ccu);
     const name = `kv_abs${ccu.header.length}_f`;
 
     ccu.emitHeader(`${type} ${name}(${args});`);
@@ -84,35 +85,47 @@ function compileLambda(
     return name;
 }
 
-function compileApply(app: Apply, ctx: Context, ccu: CompilationUnit): string {
-    const func = compile(app.func, ctx, ccu);
-    const args = app.args
+function compileApply(
+    app: Apply,
+    ctx: Context,
+    ccu: CompilationUnit,
+): string {
+    const func = compile(app.func(), ctx, ccu);
+    const args = app.args()
         .map((arg) => compile(arg, ctx, ccu))
         .join(", ");
 
     return `${func}(${args})`;
 }
 
-function compile(node: Node, ctx: Context, ccu: CompilationUnit): string {
-    switch (node.kind) {
+// function compileModule() {}
+
+function compile(
+    node: Node,
+    ctx: Context,
+    ccu: CompilationUnit,
+): string {
+    switch (node.nodekind) {
         case Kind.abs:
-            return compileLambda(node, ctx, ccu);
+            return compileLambda(node as Lambda, ctx, ccu);
         case Kind.int:
-            return compileInteger(node, ctx, ccu);
+            return compileInteger(node as Integer, ctx, ccu);
         case Kind.sym:
-            return compileSymbol(node, ctx, ccu);
+            return compileSymbol(node as Symbol, ctx, ccu);
         case Kind.app:
-            return compileApply(node, ctx, ccu);
+            return compileApply(node as Apply, ctx, ccu);
     }
 
     throw new Error("this should not have happened");
 }
 
-export function gen({ args, name }: Module) {
+export default function gen(root: Node, name: string) {
     const ccu = new CompilationUnit();
     const ctx = new Context();
 
-    args.forEach((arg) => {
+    if (root.nodekind !== Kind.mod) throw new Error("expected module");
+
+    root.children.forEach((arg) => {
         compile(arg, ctx, ccu);
     });
 
