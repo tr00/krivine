@@ -119,6 +119,8 @@ export function gen({ args, name }: Module) {
     const header = PROLOG_H(name) + ccu.header.join("\n") + EPILOG_H(name);
     const source = PROLOG_C(name) + ccu.source.join("\n") + EPILOG_C(name);
 
+    Deno.mkdir("out", { recursive: true });
+
     Deno.writeTextFile(`out/${name}.c`, source);
     Deno.writeTextFile(`out/${name}.h`, header);
 }
