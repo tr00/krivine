@@ -117,3 +117,59 @@ export class Assign implements Node {
         return this.children[1];
     }
 }
+
+export class Scope {
+    private parent: Scope | undefined;
+    private vars: Map<string, Symbol>;
+
+    constructor(parent?: Scope) {
+        this.parent = parent;
+        this.vars = new Map<string, Symbol>();
+    }
+
+    put(sym: Symbol) {
+        this.vars.set(sym.value, sym);
+    }
+
+    get(sym: Symbol): Node {
+        const res = this.vars.get(sym.value);
+
+        if (res) return res;
+
+        if (this.parent !== undefined) {
+            return this.parent.get(sym);
+        } else {
+            throw new Error(`Unresolved Symbol: ${sym.value}`);
+        }
+    }
+}
+
+type Transform<T> = (node: Node, args: T[], scope: Scope) => T;
+
+const core = new Scope();
+
+export function visit<T>(root: Node, transform: Transform<T>) {
+    let scope = core;
+    let args: T[] = [];
+
+    function _visit(node: Node): T {
+        switch (node.nodekind) {
+            case Kind.blk:
+                scope = new Scope(scope);
+                break;
+            case Kind.abs:
+                scope = new Scope(scope);
+                (node as Lambda).args.forEach((arg) => scope.put(arg));
+                break;
+            case Kind.let:
+                scope.put((node as Assign).name);
+                break;
+        }
+
+        args = node.children.map(_visit);
+
+        return transform(node, args, scope);
+    }
+
+    return _visit(root);
+}
