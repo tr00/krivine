@@ -1,11 +1,13 @@
+import { abs } from "../lib/parser.ts";
+
 export enum Kind {
-    mod = "mod",
-    int = "int",
-    sym = "sym",
-    abs = "abs",
-    app = "app",
-    blk = "blk",
-    let = "let",
+    mod = "mod", // module
+    int = "int", // integer
+    sym = "sym", // symbol
+    abs = "abs", // abstraction
+    app = "app", // application
+    blk = "blk", // block / scope
+    let = "let", // assignment
 }
 
 export interface Node {

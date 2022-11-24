@@ -1,4 +1,5 @@
 import { Apply, Integer, Kind, Lambda, Node, Symbol } from "./ast.ts";
+import { Scope, visit } from "./ast.ts";
 
 class CompilationUnit {
     header: string[] = [];

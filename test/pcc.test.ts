@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.165.0/testing/asserts.ts";
 
-import { Apply, Integer, Kind, Lambda, Module, Symbol } from "../src/ast.ts";
+import { Apply, Integer, Lambda, Module, Symbol } from "../src/ast.ts";
 import pcc from "../src/pcc.ts";
 
 Deno.test("testing pcc: example_symbol_1", () => {
